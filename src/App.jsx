@@ -60,6 +60,19 @@ function App() {
    )
   }
 
+  const jumpHomePage = (uid) => {
+    window.open(`https://space.bilibili.com/${uid}`)
+  }
+
+  const getImgStyle = (status) => {
+    let selectFilter = status === 1 ? 'grayscale(0)' : 'grayscale(100%)'
+
+    return {
+      filter: selectFilter,
+      cursor: 'pointer'
+    }
+  }
+
   return (
     <div>
       <Button type="primary" onClick={showDrawer}>
@@ -75,9 +88,27 @@ function App() {
           itemLayout="horizontal"
           dataSource={upListData}
           renderItem={(item) => (
-            <List.Item>
+            <List.Item
+              style={{
+                backgroundColor: `${item.live_status === 1 ? 'skyblue' : ''}`,
+              }}
+            >
               <List.Item.Meta
-                avatar={<Avatar src={item.face} />}
+                avatar={
+                  <Avatar
+                    src={item.face}
+                    className={item.live_status === 1 ? 'imgOrigin' : 'imgGray'}
+                    // style={getImgStyle(item.live_status)}
+                    onClick={()=> {
+                      jumpHomePage(item.uid)
+                    }}
+                    // ref={(node) => {
+                    //   if (node && item.live_status === 0) {
+                    //     node.style.setProperty('filter', 'grayscale(100%)', 'important');
+                    //   }
+                    // }}
+                  />
+                }
                 title={
                   <div>
                     <span
@@ -87,12 +118,9 @@ function App() {
                         }`,
                       }}
                     >
-                      {item.uname}-{item.live_status === 1 ? '开播' : '未开播'}
+                      {item.uname}
+                      {/* {item.live_status === 1 ? '开播' : '未开播'} */}
                     </span>
-                    -
-                    <a href={`https://space.bilibili.com/${item.uid}`} target="_blank" style={{backgroundColor: 'pink'}}>
-                      进入主页
-                    </a>
                   </div>
                 }
                 description={

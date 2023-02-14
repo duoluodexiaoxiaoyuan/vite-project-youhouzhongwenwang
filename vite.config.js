@@ -13,7 +13,8 @@ export default defineConfig({
         icon: 'https://pic2.zhimg.com/v2-58bd7241580b48ecc6aeed62dda2939b_1440w.jpg?source=172ae18b',
         namespace: 'npm/vite-plugin-monkey',
         match: ['https://t.bilibili.com/*'],
-        description: '哔哩哔哩获取正在直播的up列表,关注的up多了可能急需这个功能，要不然得每次点更多才可以拿到'
+        description: '哔哩哔哩获取正在直播的up列表,关注的up多了可能急需这个功能，要不然得每次点更多才可以拿到',
+        license: 'MIT'
       },
       build: {
         // sourcemap: 'inline',

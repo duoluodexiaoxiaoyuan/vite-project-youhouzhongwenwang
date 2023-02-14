@@ -1,0 +1,7 @@
+.imgGray {
+  filter: grayscale(100%) !important;
+}
+
+.imgOrigin {
+  filter: grayscale(0) !important;
+}
