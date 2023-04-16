@@ -83,7 +83,7 @@ function App() {
         placement="right"
         onClose={onClose}
         open={open}
-      >
+      > 
         <List
           itemLayout="horizontal"
           dataSource={upListData}
