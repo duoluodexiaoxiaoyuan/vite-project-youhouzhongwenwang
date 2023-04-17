@@ -185,24 +185,29 @@ function App() {
       // 获取页面的当前价格
       const value = getPrice()
       console.log('页面当前价格',value);
-      if ((value > selectedGood['售价']) && false) {
+      if ((value > selectedGood['售价'])) {
         const records = getChuJiaList();
         // 截取第一个出价记录
         const firstRecord = records[0];
          // 获取自己人的出价记录(如果是乱码的话或者的竞拍人也显示乱码的)
-        const allChuJiaRecordsOwn = await getAllChuJiaRecords()
-        if (!allChuJiaRecordsOwn) {
+        const allChuJiaRecords = await getAllChuJiaRecords()
+        if (!allChuJiaRecords) {
           console.log('error', '没有获取到所有出价记录', allChuJiaRecordsOwn);
           return
         }
+        const matchedRecords = allChuJiaRecords.filter(chuJiaRecord => {
+          return companion.some(record => {
+            return record.time === chuJiaRecord.bidTime;
+          });
+        });
         // 首先要判断第一个出价记录不是我自己
         if (firstRecord.bidder != '我') {
           // 从records里面截取selectedGood['前几行没有我']个出价记录
           const needTheFirstFewLinesOfRecords = records.slice(0, selectedGood['前几行没有我'])
           // 判断第一个出价记录是否是自己人并且needTheFirstFewLinesOfRecords前几位置没有我,乱码的情况我们也重新获取了自己人
-          console.log(companion, allChuJiaRecordsOwn, needTheFirstFewLinesOfRecords, '出价前的判断');
+          console.log(companion, allChuJiaRecords, matchedRecords,needTheFirstFewLinesOfRecords, '出价前的判断');
           if (
-            (allChuJiaRecordsOwn.some(
+            (matchedRecords.some(
               (item) => item.bidderNo == firstRecord.bidder
             ) ||
               companion.some((item) => item.bidder == firstRecord.bidder)) &&
@@ -229,19 +234,24 @@ function App() {
         // 截取第一个出价记录
         const firstRecord = records[0];
         // 获取所有出价记录
-        const allChuJiaRecordsOwn = await getAllChuJiaRecords()
-        if (!allChuJiaRecordsOwn) {
+        const allChuJiaRecords = await getAllChuJiaRecords()
+        if (!allChuJiaRecords) {
           console.log('error', '没有获取到所有出价记录', allChuJiaRecords);
           return
         }
+        const matchedRecords = allChuJiaRecords.filter(chuJiaRecord => {
+          return companion.some(record => {
+            return record.time === chuJiaRecord.bidTime;
+          });
+        });
         // 首先要判断第一个出价记录不是我自己
         if (firstRecord.bidder != '我') {
           // 从records里面截取selectedGood['前几行没有我']个出价记录
           const needTheFirstFewLinesOfRecords = records.slice(0, selectedGood['前几行没有我'])
           // 判断第一个出价记录是否是自己人并且needTheFirstFewLinesOfRecords前几位置没有我
-          console.log(companion, allChuJiaRecordsOwn, needTheFirstFewLinesOfRecords, '出价前的判断');
+          console.log(companion, allChuJiaRecords, needTheFirstFewLinesOfRecords, '出价前的判断');
           if (
-            (allChuJiaRecordsOwn.some(
+            (matchedRecords.some(
               (item) => item.bidderNo == firstRecord.bidder
             ) ||
               companion.some((item) => item.bidder == firstRecord.bidder)) &&
@@ -406,7 +416,7 @@ function App() {
     if (document.querySelectorAll('#J_TotalPage').length > 0) {
       // 获取出价记录的页数
       const total = document.querySelectorAll('#J_TotalPage')[0].innerText
-      const allChuJiaRecords = await requestCompanionAboutLast(total)
+      const allChuJiaRecords = await requestCompanion(total)
       console.log(allChuJiaRecords);
       return allChuJiaRecords
     }
