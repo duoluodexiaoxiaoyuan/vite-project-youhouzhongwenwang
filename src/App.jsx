@@ -68,6 +68,8 @@ function App() {
   useEffect(() => {
     console.log('rotationalTrainingConditions为',rotationalTrainingConditions);
     if (rotationalTrainingConditions) {
+      // 获取脚本轮训时间
+      const scriptRotationalTrainingTime = excelSelectedGood['脚本轮巡时间'];
       timerId = setInterval(() => {
         console.log('轮训中');
         // 开始轮询
@@ -80,9 +82,10 @@ function App() {
         const excelCpuntDown = convertCountdownToSeconds(excelSelectedGood['距结束时间'], 'excel倒计时')
         console.log('页面倒计时', countdown, '转换为秒以后是多少', pageCountDown);
         console.log('excel距结束时间', excelSelectedGood['距结束时间'], '转换为秒以后是多少', excelCpuntDown);
+        console.log('脚本轮巡时间',scriptRotationalTrainingTime);
         const skuId = getQueryVariable(window.location.href);
         isRotationalTraining(pageCountDown, excelCpuntDown, excelSelectedGood, companion, skuId)
-      }, 5 * 1000);          
+      }, scriptRotationalTrainingTime * 1000);          
     }
   }, [rotationalTrainingConditions])
 
@@ -185,14 +188,14 @@ function App() {
       // 获取页面的当前价格
       const value = getPrice()
       console.log('页面当前价格',value);
-      if ((value > selectedGood['售价'])) {
+      if ((value > selectedGood['售价']) && false) {
         const records = getChuJiaList();
         // 截取第一个出价记录
         const firstRecord = records[0];
          // 获取自己人的出价记录(如果是乱码的话或者的竞拍人也显示乱码的)
         const allChuJiaRecords = await getAllChuJiaRecords()
         if (!allChuJiaRecords) {
-          console.log('error', '没有获取到所有出价记录', allChuJiaRecordsOwn);
+          console.log('error', '没有获取到所有出价记录', allChuJiaRecords);
           return
         }
         const matchedRecords = allChuJiaRecords.filter(chuJiaRecord => {
@@ -251,10 +254,6 @@ function App() {
           // 判断第一个出价记录是否是自己人并且needTheFirstFewLinesOfRecords前几位置没有我
           console.log(companion, allChuJiaRecords, needTheFirstFewLinesOfRecords, '出价前的判断');
           if (
-            (matchedRecords.some(
-              (item) => item.bidderNo == firstRecord.bidder
-            ) ||
-              companion.some((item) => item.bidder == firstRecord.bidder)) &&
             (needTheFirstFewLinesOfRecords.every((item) => item.bidder != '我'))
           ) {
             console.log('出价', '页面价格小于等于excel售价');

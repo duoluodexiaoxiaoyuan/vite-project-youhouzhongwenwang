@@ -83,7 +83,11 @@ function App() {
 
               }
             }
-            document.getElementsByClassName('submit-btn text-btn')[0].click()
+            // 修改编辑并放入仓库的点击时间
+            setTimeout(() => {
+              console.log('点击修改编辑并放入仓库');
+              document.getElementsByClassName('submit-btn text-btn')[0].click()
+            }, 5000);
           } else {
             console.log(
               '当前页面匹配到excel中有两个相同的skuid不知道操作哪一个，请检查'
