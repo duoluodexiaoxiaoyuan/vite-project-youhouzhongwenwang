@@ -9,10 +9,12 @@ export default defineConfig({
     monkey({
       entry: 'src/main.jsx',
       userscript: {
-        name: '淘宝脚本',
-        icon: 'https://ts1.cn.mm.bing.net/th?id=OIP-C.hpjQBHE4wfYFA1nm4KhTDwAAAA&w=173&h=185&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2',
+        name: '单词本记录',
+        icon: 'https://bpic.588ku.com/element_origin_min_pic/19/06/25/5eba9cb233c28bd907e69c04ba6e1a89.jpg',
         namespace: 'npm/vite-plugin-monkey',
-        match: ['https://paimai.taobao.com/console/edit_auction.htm?*', 'https://paimai.taobao.com/console/unialbum/index.htm#/auction/list'],
+        match: ['https://github.com/', 'https://react.dev/reference/react'],
+        description: '哔哩哔哩获取正在直播的up列表,关注的up多了可能急需这个功能，要不然得每次点更多才可以拿到',
+        license: 'MIT'
       },
       build: {
         // sourcemap: 'inline',

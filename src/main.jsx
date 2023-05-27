@@ -5,11 +5,14 @@ import './index.css'
 ReactDOM.createRoot(
   (() => {
     const app = document.createElement('div');
-    app.setAttribute("class", "jb_content");
-    // 获取页面content
-    const pageContent = document.querySelector('#content');
-    // document.body.append(app);
-    pageContent.before(app)
+    app.setAttribute('class', 'upList')
+
+    // const app = GM_addElement('div', {class: 'upList'});
+    // 获取页面container
+    // const pageContent = document.querySelector('#app')
+    // pageContent.append(app);
+    document.body.append(app)
+    // GM_addElement(document.body, 'div', {class: 'upList', textContent: app});
     return app;
   })(),
 ).render(

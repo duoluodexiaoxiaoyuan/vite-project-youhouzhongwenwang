@@ -15,9 +15,15 @@ function App() {
   const [excelSelectedGoodPrice, setExcelSelectedGoodPrice] = useState('')
   // 自己人
   const [companion, setCompanion] = useState([])
-  // 是否出去
+  // 是否出价
   const [isChuJiaFlag, setIsChuJiaFlag] = useState(false)
+  // excelSheet
+  const [excelSheet, setExcelSheet] = useState('')
   useEffect(() => {
+    // 获取excel的sheet
+    if (window.localStorage.getItem('taoBaoExcelSheetAboutChuJia')) {
+      setExcelSheet(window.localStorage.getItem('taoBaoExcelSheetAboutChuJia'))
+    }
     if (window.localStorage.getItem('taoBaoGoodsListForScriptAboutChuJia')) {
       getExcelCurrentPrice()
     } else {
@@ -185,7 +191,8 @@ function App() {
       // 获取页面的当前价格
       const value = getPrice()
       console.log('页面当前价格',value);
-      if ((value > selectedGood['售价'])) {
+      // 第二个版本是要求高于售价不出价所以我&&false就不会执行了  (value > selectedGood['售价']) && false
+      if ((value > selectedGood['售价']) && false) {
         const records = getChuJiaList();
         // 截取第一个出价记录
         const firstRecord = records[0];
@@ -551,7 +558,6 @@ function App() {
   };
 
   const onImportExcel = (file) => {
-    console.log(file);
     // 获取上传的文件对象
     // const { files } = file.target;
     // 通过FileReader对象读取文件
@@ -564,16 +570,33 @@ function App() {
         const { result } = event.target;
         // 以二进制流方式读取得到整份excel表格对象
         const workbook = XLSX.read(result, { type: 'binary' });
+        console.log(workbook);
         let data = []; // 存储获取到的数据
-        // 遍历每张工作表进行读取（这里默认只读取第一张表）
-        for (const sheet in workbook.Sheets) {
-          if (workbook.Sheets.hasOwnProperty(sheet)) {
-            // 利用 sheet_to_json 方法将 excel 转成 json 数据
-            data = data.concat(
-              XLSX.utils.sheet_to_json(workbook.Sheets[sheet])
-            );
-            break; // 如果只取第一张表，就取消注释这行
+        // 判断workbook.SheetNames中是否包含excelSheet,如果包含就直接读取对应的Sheet表，如果不包含就读取第一张表
+        if (workbook.SheetNames.includes(excelSheet)) {
+          // 遍历每张工作表进行读取
+          for (const sheet in workbook.Sheets) {
+            if (workbook.Sheets.hasOwnProperty(sheet)) {
+              if (sheet === excelSheet) {
+                // 利用 sheet_to_json 方法将 excel 转成 json 数据
+                data = data.concat(
+                  XLSX.utils.sheet_to_json(workbook.Sheets[sheet])
+                );
+              }
+            }
           }
+        } else {
+            console.log('excelSheet的值',excelSheet)
+            // 遍历每张工作表进行读取（这里默认只读取第一张表）
+            for (const sheet in workbook.Sheets) {
+              if (workbook.Sheets.hasOwnProperty(sheet)) {
+                // 利用 sheet_to_json 方法将 excel 转成 json 数据
+                data = data.concat(
+                  XLSX.utils.sheet_to_json(workbook.Sheets[sheet])
+                );
+                break; // 这里有break是为了只读第一个表
+              }
+            }
         }
         console.log('42', data);
         window.localStorage.setItem(
@@ -629,6 +652,12 @@ function App() {
     }
   };
 
+  // 设置读取的excelSheet
+  const readExcelSheet = (e) => {
+    setExcelSheet(e.target.value);
+    window.localStorage.setItem('taoBaoExcelSheetAboutChuJia', e.target.value);
+  }
+
   return (
     <Fragment>
       <div class="jb_content">
@@ -636,6 +665,7 @@ function App() {
         {/* <input type='file' accept='.xlsx, .xls' onChange={(file) => { onImportExcel(file) }} /> */}
         <button onClick={authorizedDirectory}>点我授权目录</button>
         <button onClick={readFile}>读取本地文件</button>
+        <input type="text" placeholder='默认读取第一个sheet' onChange={readExcelSheet} value={excelSheet} />
         <div>
           当前脚本自动操作: {switchScript ? '开' : '关'}
           <button onClick={operationScript}>

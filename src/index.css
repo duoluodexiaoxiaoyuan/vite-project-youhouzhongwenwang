@@ -1,8 +1,8 @@
-.jb_content {
-  position: absolute;
-  right: 0px;
-  height: 200px;
-  background-color: orange;
+.upList {
+  position: fixed;
+  top:80px;
+  left:5px;
   width: 200px;
-  height: 130px;
+  z-index: 999;
+  opacity:0.8;
 }

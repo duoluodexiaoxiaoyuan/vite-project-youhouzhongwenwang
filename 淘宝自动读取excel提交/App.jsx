@@ -6,9 +6,15 @@ import './App.css'
 function App() {
   let dirHandle;
   const [switchScript, setSwitchScript] = useState(false)
+  // excelSheet
+  const [excelSheet, setExcelSheet] = useState('')
   useEffect(() => {
     if (window.localStorage.getItem('taoBaoAutoOperation') == 1) {
       setSwitchScript(true)
+    }
+    // 获取excel的sheet
+    if (window.localStorage.getItem('taoBaoExcelSheetAboutAutoCommit')) {
+      setExcelSheet(window.localStorage.getItem('taoBaoExcelSheetAboutAutoCommit'))
     }
     if (window.localStorage.getItem('taoBaoGoodsListForScript') && window.localStorage.getItem('taoBaoAutoOperation') == 1 && window.location.href.indexOf('edit_auction.htm') > -1) {
       console.log(window.localStorage.getItem('taoBaoGoodsListForScript'));
@@ -86,7 +92,8 @@ function App() {
             // 修改编辑并放入仓库的点击时间
             setTimeout(() => {
               console.log('点击修改编辑并放入仓库');
-              document.getElementsByClassName('submit-btn text-btn')[0].click()
+              // 第二个版本需要不保存
+              // document.getElementsByClassName('submit-btn text-btn')[0].click()
             }, 5000);
           } else {
             console.log(
@@ -131,13 +138,31 @@ function App() {
          // 以二进制流方式读取得到整份excel表格对象
          const workbook = XLSX.read(result, { type: 'binary' });
          let data = []; // 存储获取到的数据
-         // 遍历每张工作表进行读取（这里默认只读取第一张表）
-         for (const sheet in workbook.Sheets) {
-           if (workbook.Sheets.hasOwnProperty(sheet)) {
-             // 利用 sheet_to_json 方法将 excel 转成 json 数据
-             data = data.concat(XLSX.utils.sheet_to_json(workbook.Sheets[sheet]));
-             break; // 如果只取第一张表，就取消注释这行
-           }
+         // 判断workbook.SheetNames中是否包含excelSheet,如果包含就直接读取对应的Sheet表，如果不包含就读取第一张表
+         if (workbook.SheetNames.includes(excelSheet)) {
+          // 遍历每张工作表进行读取
+          for (const sheet in workbook.Sheets) {
+            if (workbook.Sheets.hasOwnProperty(sheet)) {
+              if (sheet === excelSheet) {
+                // 利用 sheet_to_json 方法将 excel 转成 json 数据
+                data = data.concat(
+                  XLSX.utils.sheet_to_json(workbook.Sheets[sheet])
+                );
+              }
+            }
+          }
+         } else {
+            console.log('excelSheet的值',excelSheet)
+            // 遍历每张工作表进行读取（这里默认只读取第一张表）
+            for (const sheet in workbook.Sheets) {
+              if (workbook.Sheets.hasOwnProperty(sheet)) {
+                // 利用 sheet_to_json 方法将 excel 转成 json 数据
+                data = data.concat(
+                  XLSX.utils.sheet_to_json(workbook.Sheets[sheet])
+                );
+                break; // 这里有break是为了只读第一个表
+              }
+            }
          }
          console.log('42',data);
          window.localStorage.setItem("taoBaoGoodsListForScript", JSON.stringify(data))
@@ -191,6 +216,12 @@ function App() {
     
   }
 
+  // 设置读取的excelSheet
+  const readExcelSheet = (e) => {
+    setExcelSheet(e.target.value);
+    window.localStorage.setItem('taoBaoExcelSheetAboutAutoCommit', e.target.value);
+  }
+
   return (
     <Fragment>
        <div class='jb_content'>
@@ -198,6 +229,7 @@ function App() {
         {/* <input type='file' accept='.xlsx, .xls' onChange={(file) => { onImportExcel(file) }} /> */}
         <button onClick={authorizedDirectory}>点我授权目录</button>
         <button onClick={readFile}>读取本地文件</button>
+        <input type="text" placeholder='默认读取第一个sheet' onChange={readExcelSheet} value={excelSheet} />
         <div>当前脚本自动操作: {switchScript ? '开' : '关'}<button onClick={operationScript}>{switchScript ? '关闭': '开启'}</button></div>
        </div>
     </Fragment>
