@@ -195,7 +195,8 @@ function App() {
       const value = getPrice()
       console.log('页面当前价格',value);
        // 第二个版本是要求高于售价不出价所以我&&false就不会执行了  (value > selectedGood['售价']) && false
-      if ((value > selectedGood['售价']) && false) {
+       // (value > selectedGood['售价']) && false
+      if ((value > selectedGood['售价'])) {
         const records = getChuJiaList();
         // 截取第一个出价记录
         const firstRecord = records[0];
